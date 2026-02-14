@@ -165,6 +165,7 @@ button {
     backdrop-filter: blur(5px);
     border: 4px solid white;
     box-shadow: 0 0 50px rgba(255,255,255,0.5);
+    pointer-events: none;
 }
 
 .mensaje-central span {
@@ -196,23 +197,7 @@ button {
     }
 }
 
-.mensajeFinal {
-    font-size: 4em;
-    color: #fff;
-    text-shadow: 3px 3px 6px #ff006e;
-    margin-top: 30px;
-    display: none;
-    z-index: 100;
-    animation: aparecer 1s ease-out;
-    position: relative;
-}
-
-@keyframes aparecer {
-    0% { opacity: 0; transform: scale(0.5); }
-    100% { opacity: 1; transform: scale(1); }
-}
-
-/* Mensajes en los bordes */
+/* Mensajes en los bordes - AHORA EVITAN EL CENTRO */
 .mensaje-borde {
     position: fixed;
     font-size: 1.8em;
@@ -228,6 +213,9 @@ button {
     z-index: 1000;
     animation: aparecerMensaje 0.5s ease-out;
     pointer-events: none;
+    max-width: 80vw;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 @keyframes aparecerMensaje {
@@ -241,28 +229,58 @@ button {
     }
 }
 
+/* Posiciones para los mensajes - AHORA MÁS CERCA DE LOS BORDES */
 .mensaje-arriba {
     top: 20px;
     left: 50%;
     transform: translateX(-50%);
+    max-width: 90vw;
 }
 
 .mensaje-abajo {
     bottom: 20px;
     left: 50%;
     transform: translateX(-50%);
+    max-width: 90vw;
 }
 
 .mensaje-izquierda {
     left: 20px;
     top: 50%;
     transform: translateY(-50%);
+    max-width: 30vw;
 }
 
 .mensaje-derecha {
     right: 20px;
     top: 50%;
     transform: translateY(-50%);
+    max-width: 30vw;
+}
+
+/* Mensajes en las esquinas - NUEVAS POSICIONES */
+.mensaje-esquina-superior-izquierda {
+    top: 20px;
+    left: 20px;
+    max-width: 40vw;
+}
+
+.mensaje-esquina-superior-derecha {
+    top: 20px;
+    right: 20px;
+    max-width: 40vw;
+}
+
+.mensaje-esquina-inferior-izquierda {
+    bottom: 20px;
+    left: 20px;
+    max-width: 40vw;
+}
+
+.mensaje-esquina-inferior-derecha {
+    bottom: 20px;
+    right: 20px;
+    max-width: 40vw;
 }
 
 /* Contador de intentos */
@@ -352,10 +370,24 @@ button {
     border-radius: 10px;
     transition: width 0.5s ease;
 }
+
+/* Zona segura central - área donde NO aparecerán mensajes */
+.zona-segura-central {
+    position: fixed;
+    top: 30%;
+    left: 30%;
+    width: 40%;
+    height: 40%;
+    pointer-events: none;
+    z-index: 1;
+}
 </style>
 </head>
 
 <body>
+
+<!-- Zona segura invisible para referencia -->
+<div class="zona-segura-central"></div>
 
 <h1>💖 ¡Feliz Primer San Valentín! 💖</h1>
 
@@ -386,12 +418,15 @@ const botonSi = document.getElementById("si");
 const intentosSpan = document.getElementById("intentosNo");
 const barraProgreso = document.getElementById("barraProgreso");
 const body = document.body;
+const zonaSegura = document.querySelector('.zona-segura-central');
 
 // Variables
 let intentosNo = 0;
 const MAX_INTENTOS = 5;
 let crecimientoActivo = false;
 let escalaActual = 1;
+let mensajesActivos = 0;
+const MAX_MENSAJES_SIMULTANEOS = 4;
 const mensajesBorde = [
     "¡Ya casi dices que sí! 💕",
     "¡El amor crece! 💘",
@@ -401,8 +436,42 @@ const mensajesBorde = [
     "¡El destino nos une! ✨",
     "¡5 intentos y no podrás negarte! 💝",
     "¡Cada NO te acerca al SÍ! 💞",
-    "¡El amor es más fuerte! 💪❤️"
+    "¡El amor es más fuerte! 💪❤️",
+    "¡Tu amor es inevitable! 💕",
+    "¡Corazón contento! 🥰",
+    "¡Eres especial! 💖"
 ];
+
+// Función para verificar si una posición está en zona segura
+function estaEnZonaSegura(x, y) {
+    const zonaRect = {
+        left: window.innerWidth * 0.2,
+        right: window.innerWidth * 0.8,
+        top: window.innerHeight * 0.2,
+        bottom: window.innerHeight * 0.8
+    };
+    
+    return (x > zonaRect.left && x < zonaRect.right && y > zonaRect.top && y < zonaRect.bottom);
+}
+
+// Función para verificar si un mensaje se superpone con el botón Sí
+function seSuperponeConBotonSi(x, y, ancho, alto) {
+    const botonRect = botonSi.getBoundingClientRect();
+    
+    // Si el botón es muy grande, considerar solo su posición central
+    if (escalaActual > 3) {
+        const centroBotonX = botonRect.left + botonRect.width / 2;
+        const centroBotonY = botonRect.top + botonRect.height / 2;
+        const distancia = Math.sqrt(Math.pow(x - centroBotonX, 2) + Math.pow(y - centroBotonY, 2));
+        return distancia < 200; // Si está muy cerca del centro del botón grande
+    }
+    
+    // Para botón normal, verificar superposición de rectángulos
+    return !(x + ancho < botonRect.left || 
+             x > botonRect.right || 
+             y + alto < botonRect.top || 
+             y > botonRect.bottom);
+}
 
 // Función para mostrar el mensaje central "yo también, tiamo"
 function mostrarMensajeCentral() {
@@ -461,7 +530,6 @@ function explosionMasivaCorazones() {
                 
                 document.body.appendChild(corazon);
                 
-                // Animación personalizada
                 const angulo = Math.random() * Math.PI * 2;
                 const distancia = 100 + Math.random() * 200;
                 const x = Math.cos(angulo) * distancia;
@@ -531,10 +599,37 @@ function actualizarProgreso() {
     }
 }
 
-// Función para crear mensajes en los bordes
+// Función para crear mensajes en los bordes (EVITANDO EL CENTRO Y EL BOTÓN SÍ)
 function crearMensajeEnBorde() {
-    const posiciones = ['arriba', 'abajo', 'izquierda', 'derecha'];
-    const posicion = posiciones[Math.floor(Math.random() * posiciones.length)];
+    if (mensajesActivos >= MAX_MENSAJES_SIMULTANEOS) return;
+    
+    mensajesActivos++;
+    
+    // Elegir posición aleatoria entre las opciones (excluyendo el centro)
+    const posiciones = [
+        'arriba', 'abajo', 'izquierda', 'derecha',
+        'esquina-superior-izquierda', 'esquina-superior-derecha',
+        'esquina-inferior-izquierda', 'esquina-inferior-derecha'
+    ];
+    
+    // Filtrar posiciones según el tamaño del botón Sí
+    let posicionesDisponibles = [...posiciones];
+    
+    // Si el botón Sí es muy grande, evitar posiciones que puedan superponerse
+    if (escalaActual > 5) {
+        // Solo usar esquinas cuando el botón es enorme
+        posicionesDisponibles = [
+            'esquina-superior-izquierda', 'esquina-superior-derecha',
+            'esquina-inferior-izquierda', 'esquina-inferior-derecha'
+        ];
+    } else if (escalaActual > 3) {
+        // Evitar posiciones laterales si el botón es mediano
+        posicionesDisponibles = posiciones.filter(p => 
+            p.includes('esquina') || p === 'arriba' || p === 'abajo'
+        );
+    }
+    
+    const posicion = posicionesDisponibles[Math.floor(Math.random() * posicionesDisponibles.length)];
     
     const mensaje = document.createElement('div');
     mensaje.className = `mensaje-borde mensaje-${posicion}`;
@@ -550,9 +645,22 @@ function crearMensajeEnBorde() {
     
     document.body.appendChild(mensaje);
     
+    // Verificar superposición después de agregar
+    setTimeout(() => {
+        const rect = mensaje.getBoundingClientRect();
+        if (seSuperponeConBotonSi(rect.left, rect.top, rect.width, rect.height)) {
+            // Si se superpone, moverlo a una esquina
+            mensaje.className = 'mensaje-borde mensaje-esquina-superior-izquierda';
+        }
+    }, 10);
+    
+    // Eliminar después de 3 segundos
     setTimeout(() => {
         mensaje.style.animation = 'aparecerMensaje 0.5s reverse';
-        setTimeout(() => mensaje.remove(), 500);
+        setTimeout(() => {
+            mensaje.remove();
+            mensajesActivos--;
+        }, 500);
     }, 3000);
 }
 
@@ -578,10 +686,12 @@ function agrandarBotonSi() {
     botonSi.style.top = topPos + 'px';
     botonSi.style.position = 'fixed';
     
-    for (let i = 0; i < 2; i++) {
+    // Crear menos mensajes si el botón ya es grande
+    const numMensajes = escalaActual > 5 ? 1 : 2;
+    for (let i = 0; i < numMensajes; i++) {
         setTimeout(() => {
             crearMensajeEnBorde();
-        }, i * 200);
+        }, i * 300);
     }
     
     crearCorazonesAlrededor();
@@ -600,13 +710,20 @@ function taparBotonNo() {
     botonSi.style.zIndex = '2000';
     
     setTimeout(() => {
-        // En lugar de mostrar el mensajeFinal, mostramos el mensaje central rojo
         mostrarMensajeCentral();
     }, 500);
     
-    for (let i = 0; i < 8; i++) {
+    // Crear mensajes solo en esquinas para la transición final
+    for (let i = 0; i < 4; i++) {
         setTimeout(() => {
-            crearMensajeEnBorde();
+            const posiciones = ['esquina-superior-izquierda', 'esquina-superior-derecha', 
+                               'esquina-inferior-izquierda', 'esquina-inferior-derecha'];
+            const mensaje = document.createElement('div');
+            mensaje.className = `mensaje-borde mensaje-${posiciones[i]}`;
+            mensaje.textContent = "¡TE AMO! 💕";
+            document.body.appendChild(mensaje);
+            
+            setTimeout(() => mensaje.remove(), 3000);
         }, i * 200);
     }
 }
@@ -617,13 +734,14 @@ function crearCorazonesAlrededor() {
     const centroX = rect.left + rect.width / 2;
     const centroY = rect.top + rect.height / 2;
     
-    const cantidad = intentosNo === MAX_INTENTOS ? 20 : 10;
+    // Reducir cantidad de corazones si el botón es grande
+    const cantidad = intentosNo === MAX_INTENTOS ? 10 : (escalaActual > 5 ? 5 : 10);
     
     for (let i = 0; i < cantidad; i++) {
         setTimeout(() => {
-            for (let j = 0; j < 3; j++) {
+            for (let j = 0; j < 2; j++) {
                 const angulo = Math.random() * Math.PI * 2;
-                const distancia = 100 + Math.random() * 200;
+                const distancia = 100 + Math.random() * (escalaActual > 5 ? 300 : 200);
                 const x = centroX + Math.cos(angulo) * distancia;
                 const y = centroY + Math.sin(angulo) * distancia;
                 
@@ -669,11 +787,11 @@ botonNo.addEventListener("click", (e) => {
         actualizarProgreso();
         agrandarBotonSi();
         
-        for (let i = 0; i < 8; i++) {
+        for (let i = 0; i < 5; i++) {
             setTimeout(() => {
                 crearCorazon(
-                    e.clientX + (Math.random() - 0.5) * 200,
-                    e.clientY + (Math.random() - 0.5) * 200
+                    e.clientX + (Math.random() - 0.5) * 150,
+                    e.clientY + (Math.random() - 0.5) * 150
                 );
             }, i * 50);
         }
@@ -706,13 +824,13 @@ window.addEventListener('load', () => {
     actualizarProgreso();
     
     setInterval(() => {
-        if (!body.classList.contains('rojo')) {
+        if (!body.classList.contains('rojo') && Math.random() > 0.7) {
             crearCorazon(
                 Math.random() * window.innerWidth,
                 Math.random() * window.innerHeight
             );
         }
-    }, 3000);
+    }, 2000);
 });
 
 // Actualizar al cambiar tamaño
