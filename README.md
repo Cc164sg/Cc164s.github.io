@@ -218,7 +218,6 @@ const intentosSpan = document.getElementById("intentosNo");
 
 // Variables
 let intentosNo = 0;
-let tiempoUltimoMovimiento = 0;
 const mensajesDivertidos = [
     "¡No puedes escapar de mi amor! 💕",
     "¡El amor es más fuerte! 💪❤️",
@@ -230,19 +229,38 @@ const mensajesDivertidos = [
     "¡El amor siempre gana! 🏆❤️"
 ];
 
-// Posición inicial del botón No
-function posicionarBotonNo() {
-    const contenedor = document.querySelector('.botones');
-    const contenedorRect = contenedor.getBoundingClientRect();
+// Función para obtener límites seguros del botón
+function obtenerLimitesSeguros() {
+    const rect = botonNo.getBoundingClientRect();
+    const margenSeguridad = 10; // Margen de seguridad desde los bordes
     
-    botonNo.style.position = "absolute";
-    botonNo.style.left = "60%";
-    botonNo.style.top = "40%";
+    return {
+        minX: margenSeguridad,
+        maxX: window.innerWidth - rect.width - margenSeguridad,
+        minY: margenSeguridad,
+        maxY: window.innerHeight - rect.height - margenSeguridad
+    };
 }
 
-posicionarBotonNo();
+// Posición inicial del botón No
+function posicionarBotonNo() {
+    const limites = obtenerLimitesSeguros();
+    
+    botonNo.style.position = "absolute";
+    
+    // Posición inicial centrada a la derecha pero dentro de límites
+    let leftInicial = Math.min(window.innerWidth * 0.6, limites.maxX);
+    let topInicial = Math.min(window.innerHeight * 0.4, limites.maxY);
+    
+    // Asegurar que no esté fuera por la izquierda
+    leftInicial = Math.max(limites.minX, leftInicial);
+    topInicial = Math.max(limites.minY, topInicial);
+    
+    botonNo.style.left = leftInicial + "px";
+    botonNo.style.top = topInicial + "px";
+}
 
-// Función mejorada para que el botón No escape
+// Función mejorada para que el botón No escape (siempre dentro de la pantalla)
 function escaparBotonNo(event) {
     const rect = botonNo.getBoundingClientRect();
     const mouseX = event.clientX;
@@ -257,8 +275,8 @@ function escaparBotonNo(event) {
     const distanciaY = mouseY - centroY;
     const distancia = Math.sqrt(distanciaX * distanciaX + distanciaY * distanciaY);
     
-    // Si el mouse está cerca (180px), el botón escapa
-    if (distancia < 180) {
+    // Si el mouse está cerca (200px), el botón escapa
+    if (distancia < 200) {
         
         // Incrementar contador de intentos
         intentosNo++;
@@ -273,24 +291,31 @@ function escaparBotonNo(event) {
         crearCorazonPersecucion(mouseX, mouseY);
         
         // Calcular dirección de escape (opuesta al mouse)
-        let nuevaX = rect.left - (distanciaX * 2);
-        let nuevaY = rect.top - (distanciaY * 2);
+        let nuevaX = rect.left - (distanciaX * 1.8);
+        let nuevaY = rect.top - (distanciaY * 1.8);
         
-        // Limitar dentro de la ventana
-        nuevaX = Math.max(10, Math.min(window.innerWidth - rect.width - 10, nuevaX));
-        nuevaY = Math.max(10, Math.min(window.innerHeight - rect.height - 10, nuevaY));
+        // Obtener límites seguros
+        const limites = obtenerLimitesSeguros();
+        
+        // Limitar estrictamente dentro de la pantalla con un pequeño margen
+        nuevaX = Math.max(limites.minX, Math.min(limites.maxX, nuevaX));
+        nuevaY = Math.max(limites.minY, Math.min(limites.maxY, nuevaY));
+        
+        // Verificación adicional: si el cálculo dejó el botón fuera, ponerlo en un lugar seguro
+        if (isNaN(nuevaX) || isNaN(nuevaY)) {
+            nuevaX = limites.minX + (limites.maxX - limites.minX) * 0.7;
+            nuevaY = limites.minY + (limites.maxY - limites.minY) * 0.5;
+        }
         
         // Aplicar nueva posición
         botonNo.style.left = nuevaX + "px";
         botonNo.style.top = nuevaY + "px";
-        botonNo.style.transition = "left 0.2s ease, top 0.2s ease";
+        botonNo.style.transition = "left 0.15s ease, top 0.15s ease";
         
         // Hacer que el botón parpadee
         botonNo.style.animation = "none";
         botonNo.offsetHeight; // Forzar reflow
         botonNo.style.animation = "latido 0.3s ease";
-        
-        tiempoUltimoMovimiento = Date.now();
     }
 }
 
@@ -417,7 +442,7 @@ function lluviaCorazones() {
             });
             
             setTimeout(() => corazon.remove(), duracion * 1000);
-        }, i * 20); // Espaciado para efecto cascada
+        }, i * 20);
     }
 }
 
@@ -479,6 +504,9 @@ setInterval(() => {
         );
     }
 }, 2000);
+
+// Inicializar posición
+posicionarBotonNo();
 
 console.log("¡Feliz San Valentín! ❤️");
 </script>
