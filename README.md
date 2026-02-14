@@ -1,4 +1,3 @@
-# Cc164s.github.io
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -24,9 +23,21 @@ body {
     align-items: center;
     flex-direction: column;
     position: relative;
+    transition: background-color 1s ease;
 }
 
-/* Fondo ositos mejorado */
+body.rojo {
+    background: #ff0000 !important;
+    animation: palpitar 0.5s ease-in-out infinite;
+}
+
+@keyframes palpitar {
+    0% { background-color: #ff0000; }
+    50% { background-color: #cc0000; }
+    100% { background-color: #ff0000; }
+}
+
+/* Fondo ositos */
 body::before {
     content: "🐻 💖 🐻 💕 🐻 💘 🐻 💞 🐻 💓 🐻 💗 🐻 💝";
     font-size: 80px;
@@ -36,6 +47,12 @@ body::before {
     opacity: 0.1;
     animation: mover 45s linear infinite;
     white-space: nowrap;
+    transition: opacity 0.5s ease;
+}
+
+body.rojo::before {
+    opacity: 0.3;
+    content: "❤️ 💖 💘 💝 💕 💞 💓 💗 ❤️ 💖 💘 💝";
 }
 
 @keyframes mover {
@@ -50,6 +67,7 @@ h1 {
     z-index: 10;
     animation: latido 1.5s ease-in-out infinite;
     margin-bottom: 20px;
+    transition: opacity 0.5s ease;
 }
 
 @keyframes latido {
@@ -64,14 +82,17 @@ h1 {
     text-shadow: 1px 1px 3px rgba(0,0,0,0.2);
     z-index: 10;
     margin: 20px 0;
+    transition: opacity 0.5s ease;
 }
 
 .botones {
     margin-top: 40px;
     position: relative;
-    width: 400px;
-    height: 180px;
+    width: 100%;
+    max-width: 600px;
+    height: 200px;
     z-index: 10;
+    transition: opacity 0.5s ease;
 }
 
 button {
@@ -82,15 +103,17 @@ button {
     border-radius: 50px;
     cursor: pointer;
     position: absolute;
-    transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    transition: all 0.3s ease;
     box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+    white-space: nowrap;
 }
 
 #si {
     background: linear-gradient(45deg, #ff4d6d, #ff1e4d);
     color: white;
-    left: 5%;
-    transition: all 0.3s ease;
+    left: 10%;
+    z-index: 20;
+    transition: all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
 }
 
 #si:hover {
@@ -98,16 +121,79 @@ button {
     box-shadow: 0 0 30px #ff4d6d;
 }
 
+#si.creciendo {
+    transition: all 0.8s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+}
+
 #no {
     background: linear-gradient(45deg, #6b6b6b, #4a4a4a);
     color: white;
-    right: 5%;
-    cursor: not-allowed;
+    right: 10%;
+    cursor: pointer;
     opacity: 0.9;
+    z-index: 30;
+    transition: all 0.3s ease;
 }
 
 #no:hover {
     background: linear-gradient(45deg, #7a7a7a, #5a5a5a);
+}
+
+#no.oculto {
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.5s ease;
+}
+
+/* Mensaje central "yo también, tiamo" */
+.mensaje-central {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%) scale(0);
+    font-size: 5em;
+    color: white;
+    text-shadow: 5px 5px 10px #990000, 0 0 20px #ffcccc;
+    z-index: 2000;
+    text-align: center;
+    animation: aparecerCentral 1s ease-out forwards;
+    white-space: nowrap;
+    font-weight: bold;
+    background: rgba(255, 50, 50, 0.3);
+    padding: 30px 60px;
+    border-radius: 100px;
+    backdrop-filter: blur(5px);
+    border: 4px solid white;
+    box-shadow: 0 0 50px rgba(255,255,255,0.5);
+}
+
+.mensaje-central span {
+    display: inline-block;
+    animation: flotar 2s ease-in-out infinite;
+}
+
+@keyframes aparecerCentral {
+    0% {
+        transform: translate(-50%, -50%) scale(0);
+        opacity: 0;
+    }
+    50% {
+        transform: translate(-50%, -50%) scale(1.2);
+        opacity: 1;
+    }
+    100% {
+        transform: translate(-50%, -50%) scale(1);
+        opacity: 1;
+    }
+}
+
+@keyframes flotar {
+    0%, 100% {
+        transform: translateY(0);
+    }
+    50% {
+        transform: translateY(-20px);
+    }
 }
 
 .mensajeFinal {
@@ -116,8 +202,9 @@ button {
     text-shadow: 3px 3px 6px #ff006e;
     margin-top: 30px;
     display: none;
-    z-index: 10;
+    z-index: 100;
     animation: aparecer 1s ease-out;
+    position: relative;
 }
 
 @keyframes aparecer {
@@ -125,32 +212,57 @@ button {
     100% { opacity: 1; transform: scale(1); }
 }
 
-/* Corazones flotantes mejorados */
-.corazon-flotante {
+/* Mensajes en los bordes */
+.mensaje-borde {
     position: fixed;
-    font-size: 25px;
-    pointer-events: none;
-    z-index: 5;
-    animation: flotarCorazon linear forwards;
-}
-
-@keyframes flotarCorazon {
-    0% {
-        transform: translateY(100vh) scale(1);
-        opacity: 0.8;
-    }
-    100% {
-        transform: translateY(-20vh) scale(1.5);
-        opacity: 0;
-    }
-}
-
-/* Corazones explosión mejorados */
-.explosion-corazon {
-    position: fixed;
-    font-size: 30px;
-    pointer-events: none;
+    font-size: 1.8em;
+    color: white;
+    text-shadow: 2px 2px 4px #ff006e;
+    font-weight: bold;
+    padding: 15px 25px;
+    background: rgba(255, 75, 125, 0.7);
+    border-radius: 50px;
+    backdrop-filter: blur(5px);
+    border: 2px solid white;
+    white-space: nowrap;
     z-index: 1000;
+    animation: aparecerMensaje 0.5s ease-out;
+    pointer-events: none;
+}
+
+@keyframes aparecerMensaje {
+    from {
+        opacity: 0;
+        transform: scale(0.5);
+    }
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+.mensaje-arriba {
+    top: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+}
+
+.mensaje-abajo {
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+}
+
+.mensaje-izquierda {
+    left: 20px;
+    top: 50%;
+    transform: translateY(-50%);
+}
+
+.mensaje-derecha {
+    right: 20px;
+    top: 50%;
+    transform: translateY(-50%);
 }
 
 /* Contador de intentos */
@@ -165,26 +277,80 @@ button {
     font-size: 1.1em;
     backdrop-filter: blur(5px);
     z-index: 20;
+    transition: opacity 0.5s ease;
 }
 
-/* Mensaje especial después de varios intentos */
-.mensaje-especial {
+/* Corazones flotantes */
+.corazon-flotante {
     position: fixed;
-    bottom: 80px;
-    left: 20px;
-    background: rgba(255,255,255,0.3);
+    font-size: 25px;
+    pointer-events: none;
+    z-index: 1000;
+    animation: flotarCorazon linear forwards;
+}
+
+@keyframes flotarCorazon {
+    0% {
+        transform: translateY(100vh) scale(1);
+        opacity: 0.8;
+    }
+    100% {
+        transform: translateY(-20vh) scale(1.5);
+        opacity: 0;
+    }
+}
+
+/* Corazones de la explosión */
+.corazon-explosion {
+    position: fixed;
+    font-size: 30px;
+    pointer-events: none;
+    z-index: 1500;
+    animation: explosionVuelo 2s ease-out forwards;
+}
+
+@keyframes explosionVuelo {
+    0% {
+        transform: translate(0, 0) scale(1) rotate(0deg);
+        opacity: 1;
+    }
+    100% {
+        transform: translate(var(--x), var(--y)) scale(1.5) rotate(var(--rotacion));
+        opacity: 0;
+    }
+}
+
+/* Indicador de progreso */
+.progreso-container {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    background: rgba(255,255,255,0.2);
     padding: 15px 25px;
-    border-radius: 30px;
+    border-radius: 50px;
     color: white;
-    font-size: 1.2em;
+    font-size: 1.3em;
     backdrop-filter: blur(5px);
     z-index: 20;
-    animation: mensajeAparecer 0.5s ease-out;
+    border: 2px solid white;
+    transition: opacity 0.5s ease;
 }
 
-@keyframes mensajeAparecer {
-    from { opacity: 0; transform: translateX(-50px); }
-    to { opacity: 1; transform: translateX(0); }
+.barra-progreso {
+    width: 200px;
+    height: 20px;
+    background: rgba(255,255,255,0.3);
+    border-radius: 10px;
+    margin-top: 10px;
+    overflow: hidden;
+}
+
+.progreso-llenado {
+    height: 100%;
+    width: 0%;
+    background: linear-gradient(90deg, #ff4d6d, #ff1e4d);
+    border-radius: 10px;
+    transition: width 0.5s ease;
 }
 </style>
 </head>
@@ -200,315 +366,361 @@ button {
     <button id="no">No 😢</button>
 </div>
 
-<div class="mensajeFinal" id="mensajeFinal">
-    💕 ¡YO TAMBIÉN, TE AMO! 💕
-</div>
-
 <!-- Contador de intentos -->
 <div class="contador-intentos" id="contadorIntentos">
-    Intentos con el No: <span id="intentosNo">0</span>
+    Intentos con el No: <span id="intentosNo">0/5</span>
+</div>
+
+<!-- Indicador de progreso -->
+<div class="progreso-container">
+    <div>Progreso del amor ❤️</div>
+    <div class="barra-progreso">
+        <div class="progreso-llenado" id="barraProgreso"></div>
+    </div>
 </div>
 
 <script>
 // Elementos del DOM
 const botonNo = document.getElementById("no");
 const botonSi = document.getElementById("si");
-const mensajeFinal = document.getElementById("mensajeFinal");
 const intentosSpan = document.getElementById("intentosNo");
+const barraProgreso = document.getElementById("barraProgreso");
+const body = document.body;
 
 // Variables
 let intentosNo = 0;
-const mensajesDivertidos = [
-    "¡No puedes escapar de mi amor! 💕",
-    "¡El amor es más fuerte! 💪❤️",
-    "¡Nunca digas No en San Valentín! 😊",
-    "¡Inténtalo de nuevo! 🥺",
-    "¡Mi corazón te persigue! 🏃‍♂️❤️",
-    "¡El destino quiere que digas Sí! ✨",
-    "¡No te rindas, di Sí! 🌹",
-    "¡El amor siempre gana! 🏆❤️"
+const MAX_INTENTOS = 5;
+let crecimientoActivo = false;
+let escalaActual = 1;
+const mensajesBorde = [
+    "¡Ya casi dices que sí! 💕",
+    "¡El amor crece! 💘",
+    "¡Un paso más! 💖",
+    "¡Sí, sí, SÍ! 💓",
+    "¡No te rindas! 💗",
+    "¡El destino nos une! ✨",
+    "¡5 intentos y no podrás negarte! 💝",
+    "¡Cada NO te acerca al SÍ! 💞",
+    "¡El amor es más fuerte! 💪❤️"
 ];
 
-// Función para obtener límites seguros del botón
-function obtenerLimitesSeguros() {
-    const rect = botonNo.getBoundingClientRect();
-    const margenSeguridad = 10; // Margen de seguridad desde los bordes
+// Función para mostrar el mensaje central "yo también, tiamo"
+function mostrarMensajeCentral() {
+    // Crear el mensaje central
+    const mensajeCentral = document.createElement('div');
+    mensajeCentral.className = 'mensaje-central';
     
-    return {
-        minX: margenSeguridad,
-        maxX: window.innerWidth - rect.width - margenSeguridad,
-        minY: margenSeguridad,
-        maxY: window.innerHeight - rect.height - margenSeguridad
-    };
+    // Dividir el mensaje en letras para animación
+    const texto = "💕 yo también, tiamo 💕";
+    for (let letra of texto) {
+        const span = document.createElement('span');
+        span.textContent = letra;
+        mensajeCentral.appendChild(span);
+    }
+    
+    document.body.appendChild(mensajeCentral);
+    
+    // Poner la página roja
+    body.classList.add('rojo');
+    
+    // Ocultar elementos originales
+    document.querySelector('h1').style.opacity = '0';
+    document.querySelector('.pregunta').style.opacity = '0';
+    document.querySelector('.botones').style.opacity = '0';
+    document.querySelector('.contador-intentos').style.opacity = '0';
+    document.querySelector('.progreso-container').style.opacity = '0';
+    
+    // Explosión masiva de corazones
+    explosionMasivaCorazones();
+    
+    // Lluvia continua de corazones
+    setInterval(() => {
+        if (body.classList.contains('rojo')) {
+            crearLluviaCorazones();
+        }
+    }, 500);
 }
 
-// Posición inicial del botón No
-function posicionarBotonNo() {
-    const limites = obtenerLimitesSeguros();
+// Función para explosión masiva de corazones
+function explosionMasivaCorazones() {
+    const emojis = ['❤️', '💖', '💘', '💝', '💕', '💞', '💓', '💗', '💟', '❣️', '💔', '❤️‍🔥'];
     
-    botonNo.style.position = "absolute";
-    
-    // Posición inicial centrada a la derecha pero dentro de límites
-    let leftInicial = Math.min(window.innerWidth * 0.6, limites.maxX);
-    let topInicial = Math.min(window.innerHeight * 0.4, limites.maxY);
-    
-    // Asegurar que no esté fuera por la izquierda
-    leftInicial = Math.max(limites.minX, leftInicial);
-    topInicial = Math.max(limites.minY, topInicial);
-    
-    botonNo.style.left = leftInicial + "px";
-    botonNo.style.top = topInicial + "px";
-}
-
-// Función mejorada para que el botón No escape (siempre dentro de la pantalla)
-function escaparBotonNo(event) {
-    const rect = botonNo.getBoundingClientRect();
-    const mouseX = event.clientX;
-    const mouseY = event.clientY;
-    
-    // Calcular centro del botón
-    const centroX = rect.left + rect.width / 2;
-    const centroY = rect.top + rect.height / 2;
-    
-    // Calcular distancia
-    const distanciaX = mouseX - centroX;
-    const distanciaY = mouseY - centroY;
-    const distancia = Math.sqrt(distanciaX * distanciaX + distanciaY * distanciaY);
-    
-    // Si el mouse está cerca (200px), el botón escapa
-    if (distancia < 200) {
-        
-        // Incrementar contador de intentos
-        intentosNo++;
-        intentosSpan.textContent = intentosNo;
-        
-        // Mostrar mensaje divertido cada 3 intentos
-        if (intentosNo % 3 === 0) {
-            mostrarMensajeDivertido();
-        }
-        
-        // Crear pequeño corazón al intentar hacer clic en No
-        crearCorazonPersecucion(mouseX, mouseY);
-        
-        // Calcular dirección de escape (opuesta al mouse)
-        let nuevaX = rect.left - (distanciaX * 1.8);
-        let nuevaY = rect.top - (distanciaY * 1.8);
-        
-        // Obtener límites seguros
-        const limites = obtenerLimitesSeguros();
-        
-        // Limitar estrictamente dentro de la pantalla con un pequeño margen
-        nuevaX = Math.max(limites.minX, Math.min(limites.maxX, nuevaX));
-        nuevaY = Math.max(limites.minY, Math.min(limites.maxY, nuevaY));
-        
-        // Verificación adicional: si el cálculo dejó el botón fuera, ponerlo en un lugar seguro
-        if (isNaN(nuevaX) || isNaN(nuevaY)) {
-            nuevaX = limites.minX + (limites.maxX - limites.minX) * 0.7;
-            nuevaY = limites.minY + (limites.maxY - limites.minY) * 0.5;
-        }
-        
-        // Aplicar nueva posición
-        botonNo.style.left = nuevaX + "px";
-        botonNo.style.top = nuevaY + "px";
-        botonNo.style.transition = "left 0.15s ease, top 0.15s ease";
-        
-        // Hacer que el botón parpadee
-        botonNo.style.animation = "none";
-        botonNo.offsetHeight; // Forzar reflow
-        botonNo.style.animation = "latido 0.3s ease";
+    for (let i = 0; i < 200; i++) {
+        setTimeout(() => {
+            for (let j = 0; j < 3; j++) {
+                const corazon = document.createElement('div');
+                corazon.innerHTML = emojis[Math.floor(Math.random() * emojis.length)];
+                corazon.style.position = 'fixed';
+                corazon.style.left = (Math.random() * window.innerWidth) + 'px';
+                corazon.style.top = (Math.random() * window.innerHeight) + 'px';
+                corazon.style.fontSize = (20 + Math.random() * 50) + 'px';
+                corazon.style.pointerEvents = 'none';
+                corazon.style.zIndex = '1000';
+                corazon.style.filter = 'drop-shadow(0 0 10px gold)';
+                corazon.style.animation = 'aparecer 0.5s ease-out';
+                
+                document.body.appendChild(corazon);
+                
+                // Animación personalizada
+                const angulo = Math.random() * Math.PI * 2;
+                const distancia = 100 + Math.random() * 200;
+                const x = Math.cos(angulo) * distancia;
+                const y = Math.sin(angulo) * distancia;
+                
+                corazon.animate([
+                    { transform: 'translate(0, 0) scale(1)', opacity: 1 },
+                    { transform: `translate(${x}px, ${y}px) scale(1.5)`, opacity: 0 }
+                ], {
+                    duration: 2000,
+                    easing: 'ease-out'
+                });
+                
+                setTimeout(() => corazon.remove(), 2000);
+            }
+        }, i * 20);
     }
 }
 
-// Mostrar mensaje divertido
-function mostrarMensajeDivertido() {
-    const mensajeDivertido = document.createElement('div');
-    mensajeDivertido.className = 'mensaje-especial';
-    mensajeDivertido.textContent = mensajesDivertidos[Math.floor(Math.random() * mensajesDivertidos.length)];
+// Función para crear lluvia de corazones
+function crearLluviaCorazones() {
+    const emojis = ['❤️', '💖', '💘', '💝', '💕', '💞', '💓', '💗'];
     
-    document.body.appendChild(mensajeDivertido);
+    for (let i = 0; i < 10; i++) {
+        setTimeout(() => {
+            const corazon = document.createElement('div');
+            corazon.innerHTML = emojis[Math.floor(Math.random() * emojis.length)];
+            corazon.style.position = 'fixed';
+            corazon.style.left = Math.random() * 100 + 'vw';
+            corazon.style.top = '-50px';
+            corazon.style.fontSize = (20 + Math.random() * 40) + 'px';
+            corazon.style.pointerEvents = 'none';
+            corazon.style.zIndex = '900';
+            corazon.style.filter = 'drop-shadow(0 0 5px white)';
+            
+            document.body.appendChild(corazon);
+            
+            const duracion = 3 + Math.random() * 3;
+            const rotacion = Math.random() * 360;
+            
+            corazon.animate([
+                { transform: `translateY(0) rotate(0deg)`, opacity: 1 },
+                { transform: `translateY(120vh) rotate(${rotacion}deg)`, opacity: 0.5 }
+            ], {
+                duration: duracion * 1000,
+                easing: 'linear'
+            });
+            
+            setTimeout(() => corazon.remove(), duracion * 1000);
+        }, i * 100);
+    }
+}
+
+// Evento click en botón SÍ
+botonSi.addEventListener("click", () => {
+    mostrarMensajeCentral();
+});
+
+// Función para actualizar barra de progreso
+function actualizarProgreso() {
+    const progreso = (intentosNo / MAX_INTENTOS) * 100;
+    barraProgreso.style.width = progreso + '%';
+    intentosSpan.textContent = intentosNo + '/' + MAX_INTENTOS;
+    
+    if (intentosNo >= MAX_INTENTOS - 1) {
+        barraProgreso.style.background = 'linear-gradient(90deg, #ffd700, #ffa500)';
+    }
+}
+
+// Función para crear mensajes en los bordes
+function crearMensajeEnBorde() {
+    const posiciones = ['arriba', 'abajo', 'izquierda', 'derecha'];
+    const posicion = posiciones[Math.floor(Math.random() * posiciones.length)];
+    
+    const mensaje = document.createElement('div');
+    mensaje.className = `mensaje-borde mensaje-${posicion}`;
+    
+    if (intentosNo === MAX_INTENTOS - 1) {
+        mensaje.textContent = "¡ÚLTIMO INTENTO! 💘";
+    } else {
+        mensaje.textContent = mensajesBorde[Math.floor(Math.random() * mensajesBorde.length)];
+    }
+    
+    const emojis = ['❤️', '💖', '💘', '💝', '💕', '💞', '💓', '💗'];
+    mensaje.textContent += ' ' + emojis[Math.floor(Math.random() * emojis.length)];
+    
+    document.body.appendChild(mensaje);
     
     setTimeout(() => {
-        mensajeDivertido.remove();
+        mensaje.style.animation = 'aparecerMensaje 0.5s reverse';
+        setTimeout(() => mensaje.remove(), 500);
     }, 3000);
 }
 
-// Crear corazón donde el mouse intentó hacer clic en No
-function crearCorazonPersecucion(x, y) {
+// Función para agrandar el botón Sí
+function agrandarBotonSi() {
+    if (!crecimientoActivo) {
+        crecimientoActivo = true;
+        botonSi.classList.add('creciendo');
+    }
+    
+    escalaActual = 1 + (intentosNo * 0.8);
+    botonSi.style.transform = `scale(${escalaActual})`;
+    botonSi.style.zIndex = 1000 - intentosNo;
+    
+    const rect = botonSi.getBoundingClientRect();
+    const windowWidth = window.innerWidth;
+    const windowHeight = window.innerHeight;
+    
+    const leftPos = (windowWidth / 2) - (rect.width * escalaActual / 2);
+    const topPos = (windowHeight / 2) - (rect.height * escalaActual / 2);
+    
+    botonSi.style.left = leftPos + 'px';
+    botonSi.style.top = topPos + 'px';
+    botonSi.style.position = 'fixed';
+    
+    for (let i = 0; i < 2; i++) {
+        setTimeout(() => {
+            crearMensajeEnBorde();
+        }, i * 200);
+    }
+    
+    crearCorazonesAlrededor();
+    
+    if (intentosNo >= MAX_INTENTOS) {
+        taparBotonNo();
+    }
+}
+
+// Función para tapar el botón No
+function taparBotonNo() {
+    botonNo.classList.add('oculto');
+    botonSi.style.transform = 'translate(-50%, -50%) scale(15)';
+    botonSi.style.left = '50%';
+    botonSi.style.top = '50%';
+    botonSi.style.zIndex = '2000';
+    
+    setTimeout(() => {
+        // En lugar de mostrar el mensajeFinal, mostramos el mensaje central rojo
+        mostrarMensajeCentral();
+    }, 500);
+    
+    for (let i = 0; i < 8; i++) {
+        setTimeout(() => {
+            crearMensajeEnBorde();
+        }, i * 200);
+    }
+}
+
+// Función para crear corazones alrededor
+function crearCorazonesAlrededor() {
+    const rect = botonSi.getBoundingClientRect();
+    const centroX = rect.left + rect.width / 2;
+    const centroY = rect.top + rect.height / 2;
+    
+    const cantidad = intentosNo === MAX_INTENTOS ? 20 : 10;
+    
+    for (let i = 0; i < cantidad; i++) {
+        setTimeout(() => {
+            for (let j = 0; j < 3; j++) {
+                const angulo = Math.random() * Math.PI * 2;
+                const distancia = 100 + Math.random() * 200;
+                const x = centroX + Math.cos(angulo) * distancia;
+                const y = centroY + Math.sin(angulo) * distancia;
+                
+                crearCorazon(x, y);
+            }
+        }, i * 50);
+    }
+}
+
+// Función para crear un corazón
+function crearCorazon(x, y) {
     const corazon = document.createElement('div');
-    corazon.innerHTML = '💖';
+    corazon.innerHTML = ['❤️', '💖', '💘', '💝', '💕', '💞', '💓', '💗'][Math.floor(Math.random() * 8)];
     corazon.style.position = 'fixed';
     corazon.style.left = x + 'px';
     corazon.style.top = y + 'px';
-    corazon.style.fontSize = '25px';
+    corazon.style.fontSize = (20 + Math.random() * 40) + 'px';
     corazon.style.pointerEvents = 'none';
-    corazon.style.zIndex = '1000';
-    corazon.style.animation = 'aparecer 0.5s ease-out';
+    corazon.style.zIndex = '500';
+    corazon.style.animation = 'aparecer 0.8s ease-out';
+    corazon.style.filter = 'drop-shadow(0 0 5px hotpink)';
     
     document.body.appendChild(corazon);
     
-    setTimeout(() => corazon.remove(), 500);
+    corazon.animate([
+        { transform: 'translateY(0px) rotate(0deg)', opacity: 1 },
+        { transform: `translateY(-${80 + Math.random() * 100}px) rotate(${Math.random() * 360}deg)`, opacity: 0 }
+    ], {
+        duration: 2000,
+        easing: 'ease-out'
+    });
+    
+    setTimeout(() => corazon.remove(), 2000);
 }
 
-// Evento mousemove para que el botón No escape
-document.addEventListener("mousemove", escaparBotonNo);
-
-// Prevenir que el botón No reciba clics
+// Evento click en botón No
 botonNo.addEventListener("click", (e) => {
     e.preventDefault();
     e.stopPropagation();
     
-    // Crear corazón extra
-    for (let i = 0; i < 5; i++) {
-        setTimeout(() => {
-            crearCorazonPersecucion(
-                e.clientX + (Math.random() - 0.5) * 100,
-                e.clientY + (Math.random() - 0.5) * 100
-            );
-        }, i * 50);
+    if (intentosNo < MAX_INTENTOS) {
+        intentosNo++;
+        actualizarProgreso();
+        agrandarBotonSi();
+        
+        for (let i = 0; i < 8; i++) {
+            setTimeout(() => {
+                crearCorazon(
+                    e.clientX + (Math.random() - 0.5) * 200,
+                    e.clientY + (Math.random() - 0.5) * 200
+                );
+            }, i * 50);
+        }
+        
+        if (intentosNo === MAX_INTENTOS) {
+            setTimeout(() => {
+                crearMensajeEnBorde();
+            }, 500);
+        }
     }
     
     return false;
 });
 
-// Función mejorada de explosión de corazones
-function explosionCorazones() {
-    const centroX = window.innerWidth / 2;
-    const centroY = window.innerHeight / 2;
-    const emojis = ['❤️', '💖', '💘', '💝', '💕', '💞', '💓', '💗', '💟'];
+// Posicionar botones inicialmente
+function posicionarBotones() {
+    botonSi.style.left = '10%';
+    botonSi.style.top = '50%';
+    botonSi.style.transform = 'translateY(-50%) scale(1)';
+    botonSi.style.position = 'absolute';
     
-    for (let i = 0; i < 120; i++) {
-        let corazon = document.createElement("div");
-        corazon.innerHTML = emojis[Math.floor(Math.random() * emojis.length)];
-        corazon.className = "explosion-corazon";
-        corazon.style.left = centroX + "px";
-        corazon.style.top = centroY + "px";
-        
-        let angulo = Math.random() * 2 * Math.PI;
-        let distancia = Math.random() * 400 + 100;
-        let rotacion = Math.random() * 360;
-        let escala = 0.5 + Math.random() * 1.5;
-        
-        let x = Math.cos(angulo) * distancia;
-        let y = Math.sin(angulo) * distancia;
-        
-        document.body.appendChild(corazon);
-        
-        corazon.animate([
-            { 
-                transform: `translate(0, 0) scale(1) rotate(0deg)`,
-                opacity: 1 
-            },
-            { 
-                transform: `translate(${x}px, ${y}px) scale(${escala}) rotate(${rotacion}deg)`,
-                opacity: 0 
-            }
-        ], {
-            duration: 2000,
-            easing: "cubic-bezier(0.25, 0.1, 0.25, 1)"
-        });
-        
-        setTimeout(() => corazon.remove(), 2000);
-    }
+    botonNo.style.right = '10%';
+    botonNo.style.top = '50%';
+    botonNo.style.transform = 'translateY(-50%)';
 }
 
-// Función mejorada de lluvia de corazones
-function lluviaCorazones() {
-    const emojis = ['❤️', '💖', '💘', '💝', '💕', '💞', '💓', '💗', '💟'];
+// Inicializar
+window.addEventListener('load', () => {
+    posicionarBotones();
+    actualizarProgreso();
     
-    for (let i = 0; i < 200; i++) {
-        setTimeout(() => {
-            let corazon = document.createElement("div");
-            corazon.innerHTML = emojis[Math.floor(Math.random() * emojis.length)];
-            corazon.className = "corazon-flotante";
-            corazon.style.left = Math.random() * 100 + "vw";
-            corazon.style.fontSize = (15 + Math.random() * 30) + "px";
-            
-            let duracion = Math.random() * 4 + 3;
-            
-            document.body.appendChild(corazon);
-            
-            corazon.animate([
-                { 
-                    transform: `translateY(100vh) scale(${0.5 + Math.random()})`,
-                    opacity: 0.8 
-                },
-                { 
-                    transform: `translateY(-20vh) scale(${1.5 + Math.random()})`,
-                    opacity: 0 
-                }
-            ], {
-                duration: duracion * 1000,
-                easing: "linear"
-            });
-            
-            setTimeout(() => corazon.remove(), duracion * 1000);
-        }, i * 20);
-    }
-}
-
-// Cuando presiona SÍ - versión mejorada
-botonSi.addEventListener("click", () => {
-    // Mostrar mensaje
-    mensajeFinal.style.display = "block";
-    
-    // Ocultar botones
-    document.querySelector('.botones').style.opacity = '0';
-    document.querySelector('.botones').style.pointerEvents = 'none';
-    
-    // Ocultar contador
-    document.querySelector('.contador-intentos').style.opacity = '0';
-    
-    // Explosión principal
-    explosionCorazones();
-    
-    // Lluvia continua
-    lluviaCorazones();
-    
-    // Segunda explosión después de 1 segundo
-    setTimeout(() => explosionCorazones(), 1000);
-    
-    // Tercera explosión después de 2 segundos
-    setTimeout(() => explosionCorazones(), 2000);
-    
-    // Crear corazones alrededor del mensaje
-    let contadorMensaje = 0;
-    const intervaloMensaje = setInterval(() => {
-        if (contadorMensaje < 10) {
-            const rect = mensajeFinal.getBoundingClientRect();
-            if (rect.top) {
-                crearCorazonPersecucion(
-                    rect.left + rect.width / 2 + (Math.random() - 0.5) * 200,
-                    rect.top + rect.height / 2 + (Math.random() - 0.5) * 200
-                );
-            }
-            contadorMensaje++;
-        } else {
-            clearInterval(intervaloMensaje);
+    setInterval(() => {
+        if (!body.classList.contains('rojo')) {
+            crearCorazon(
+                Math.random() * window.innerWidth,
+                Math.random() * window.innerHeight
+            );
         }
-    }, 200);
+    }, 3000);
 });
 
-// Ajustar posición al cambiar tamaño de ventana
+// Actualizar al cambiar tamaño
 window.addEventListener('resize', () => {
-    if (mensajeFinal.style.display !== 'block') {
-        posicionarBotonNo();
+    if (!crecimientoActivo) {
+        posicionarBotones();
     }
 });
-
-// Agregar corazones de fondo aleatorios
-setInterval(() => {
-    if (mensajeFinal.style.display !== 'block') {
-        crearCorazonPersecucion(
-            Math.random() * window.innerWidth,
-            Math.random() * window.innerHeight
-        );
-    }
-}, 2000);
-
-// Inicializar posición
-posicionarBotonNo();
-
-console.log("¡Feliz San Valentín! ❤️");
 </script>
 
 </body>
